@@ -29,6 +29,15 @@ public class Main {
         rs.close();
         stmt.close();
 
+        // table names
+        stmt = connection.createStatement();
+        rs = stmt.executeQuery( "SELECT table_name FROM " +
+                "information_schema.tables WHERE " +
+                "table_schema = 'public' AND table_type = 'BASE TABLE'");
+        while ( rs.next() ) {
+            System.out.println( rs.getString("table_name"));
+        }
+
         // delete
         stmt = connection.createStatement();
         stmt.executeUpdate("DELETE FROM public.user WHERE id > 10 AND id < 100");
@@ -41,5 +50,6 @@ public class Main {
         ps.setString(1, pass);
         ps.executeUpdate();
         ps.close();
+        connection.close();
     }
 }
