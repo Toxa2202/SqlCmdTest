@@ -64,12 +64,13 @@ public class DatabaseManager {
         DataSet[] result = new DataSet[size];
         int index  = 0;
 
-        while ( rs.next() ) {
+        while (rs.next()) {
             // Save every line in array with index iteration
             DataSet dataSet = new DataSet();
             result[index++] = dataSet;
+                // Save info from all not-empty tables with PUT method
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-                dataSet.put(rsmd.getColumnName(1), rs.getObject(1));
+                dataSet.put(rsmd.getColumnName(i), rs.getObject(i));
             }
         }
         rs.close();

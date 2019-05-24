@@ -1,5 +1,7 @@
 package ua.com.juja.sviatov.sqlcmd;
 
+import java.util.Arrays;
+
 /**
  * Created by anton.sviatov on 24.05.2019.
  */
@@ -45,5 +47,13 @@ public class DataSet {
             result[i] = data[i].getName();
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "DataSet{\n" +
+                "names:" + Arrays.toString(getNames()) + "\n" +
+                "values:" + Arrays.toString(getValues()) + "\n" +
+                "}";
     }
 }
