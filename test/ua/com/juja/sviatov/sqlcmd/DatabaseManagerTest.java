@@ -1,12 +1,10 @@
-package ua.com.juja.sqlcmd;
+package ua.com.juja.sviatov.sqlcmd;
 
 import org.junit.Before;
 import org.junit.Test;
-import ua.com.juja.anton.sviatov.DatabaseManager;
+import ua.com.juja.sviatov.sqlcmd.DatabaseManager;
 
-import java.sql.Connection;
 import java.util.Arrays;
-
 import static junit.framework.TestCase.assertEquals;
 
 /**

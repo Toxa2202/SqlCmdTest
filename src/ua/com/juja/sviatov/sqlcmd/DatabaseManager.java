@@ -1,4 +1,4 @@
-package ua.com.juja.anton.sviatov;
+package ua.com.juja.sviatov.sqlcmd;
 
 import java.sql.*;
 import java.util.Arrays;
