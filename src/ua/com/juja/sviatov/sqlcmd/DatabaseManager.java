@@ -8,46 +8,43 @@ import java.util.Random;
  * Created by anton.sviatov on 23.05.2019.
  */
 public class DatabaseManager {
+        // Initialize connection once
     private Connection connection;
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
+    public static void main(String[] args) throws SQLException {
+            // Database information
         String database = "sqlcmd";
         String user = "postgres";
         String password = "postgres";
 
+            // Create DatabaseManager object
         DatabaseManager manager = new DatabaseManager();
-
+            // With connect method create connection (with parameters)
         manager.connect(database, user, password);
-
+            // Create connection with getConnection TODO refactor that
         Connection connection = manager.getConnection();
 
-        // insert
+        /** Insert */
         Statement stmt = connection.createStatement();
         stmt.executeUpdate("INSERT INTO public.user (name, password)"
                 + "VALUES ('Stiven', 'Pupkin');");
 
-        // select
-        String[] tables = manager.getTableNames();
+        /** Select */
+            // First get list of tables through getTableNames method
+            // TODO two operations in one box (tables & select)
+        String[] tables = manager.getTableNames(); // Array to store list of DB's
+        System.out.println(Arrays.toString(tables)); // Show list on the screen
 
-        System.out.println(Arrays.toString(tables));
+        String tableName = "user";
+        DataSet[] result = manager.getTableData(tableName);
+        System.out.println(Arrays.toString(result));
 
-        stmt = connection.createStatement();
-        ResultSet rs = stmt.executeQuery( "SELECT * FROM public.user WHERE id > 10" );
-        while ( rs.next() ) {
-            System.out.println( "id: " + rs.getString("id"));
-            System.out.println( "name: " + rs.getString("name"));
-            System.out.println( "password: " + rs.getString("password"));
-            System.out.println("-----");
-        }
-        rs.close();
-        stmt.close();
-
-        // delete
+        /** Delete */
         stmt = connection.createStatement();
         stmt.executeUpdate("DELETE FROM public.user WHERE id > 10 AND id < 100");
         stmt.close();
 
-        // update
+        /** Update */
         PreparedStatement ps = connection.prepareStatement(
                 "UPDATE public.user SET password = ? WHERE id > 3");
         String pass = "password_" + new Random().nextInt();
@@ -57,46 +54,97 @@ public class DatabaseManager {
         connection.close();
     }
 
+    public DataSet[] getTableData(String tableName) throws SQLException {
+        int size = getSize(tableName);
+
+        Statement stmt = connection.createStatement();
+        ResultSet rs = stmt.executeQuery("SELECT * FROM public." + tableName);
+        ResultSetMetaData rsmd = rs.getMetaData();
+        // Array to store all saved data from the tables
+        DataSet[] result = new DataSet[size];
+        int index  = 0;
+
+        while ( rs.next() ) {
+            // Save every line in array with index iteration
+            DataSet dataSet = new DataSet();
+            result[index++] = dataSet;
+            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                dataSet.put(rsmd.getColumnName(1), rs.getObject(1));
+            }
+        }
+        rs.close();
+        stmt.close();
+        return result;
+    }
+
+    private int getSize(String tableName) throws SQLException {
+        Statement stmt = connection.createStatement();
+        // Get number of all written data elements
+        ResultSet rsCount = stmt.executeQuery("SELECT COUNT(*) FROM public." + tableName);
+        rsCount.next();
+        // Save than number to integer variable
+        int size = rsCount.getInt(1);
+        rsCount.close();
+        return size;
+    }
+
+    // Get List of existing tables
     public String[] getTableNames() {
+            // try to catch SQL errors
         try {
             Statement stmt = connection.createStatement();
+                // Select all tables
             ResultSet rs = stmt.executeQuery("SELECT table_name FROM " +
                     "information_schema.tables WHERE table_schema = 'public' AND " +
                     "table_type = 'BASE TABLE'");
+                // Create empty 100  String array
             String[] tables = new String[100];
             int index = 0;
+                // Put info inside the array, call every time ResultSet
             while (rs.next()) {
                 tables[index++] = rs.getString("table_name");
             }
+                // Save only not empty fields in the array
             tables = Arrays.copyOf(tables, index, String[].class);
             stmt.close();
             rs.close();
+                // Return list of tables upstairs
             return tables;
         } catch (SQLException e) {
             e.printStackTrace();
+                // If Error, return empty array
             return new String[0];
         }
     }
 
+        // Connection to Database
     public void connect (String database, String user, String password) {
+            // Try to catch ClassNotFoundException errors
         try {
+                // Connect to jdbc driver
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
+                // If Error - get message
             System.out.println("Please add jdbc jar to project");
             e.printStackTrace();
         }
 
+            // Try to catch SQLException errors
         try {
+                // Make connection to current DB with login / password
             connection = DriverManager.getConnection(
-                        "jdbc:postgresql://localhost:5434/" + database, user,
-                    password);
+                        "jdbc:postgresql://localhost:5434/"
+                                + database, user, password);
         } catch (SQLException e) {
+                // If errors - get message
             System.out.println(String.format("Can't get connection for database:%s user:%s", database, user));
             e.printStackTrace();
+                // close connection
             connection = null;
         }
     }
 
+        // Getter for connection
     private Connection getConnection() {
         return connection;
     }
