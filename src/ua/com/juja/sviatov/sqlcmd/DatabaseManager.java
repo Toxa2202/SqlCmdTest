@@ -170,19 +170,8 @@ public class DatabaseManager {
         try {
             Statement stmt = connection.createStatement();
 
-            String tableNames = "";
-            for (String name : input.getNames()) {
-                tableNames += name + ",";
-            }
-                // delete last symbol by substring
-            tableNames = tableNames.substring(0, tableNames.length() - 1);
-
-            String values = "";
-            for (Object value: input.getValues()) {
-                values += "'" + value.toString() + "'" + ",";
-            }
-            // delete last symbol by substring
-            values = values.substring(0, values.length() - 1);
+            String tableNames = getNamesFormatted(input, "%s,");
+            String values = getValuesFormatted(input, "'%s',");
 
             stmt.executeUpdate("INSERT INTO public.user (" + tableNames + ")" +
                     "VALUES (" + values + ")");
@@ -190,5 +179,43 @@ public class DatabaseManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private String getValuesFormatted(DataSet input, String format) {
+        String values = "";
+        for (Object value: input.getValues()) {
+            values += String.format(format, value);
+        }
+        // delete last symbol by substring
+        values = values.substring(0, values.length() - 1);
+        return values;
+    }
+
+    public void update(String tableName, int id, DataSet newValue) {
+        try {
+            String tableNames = getNamesFormatted(newValue, "%s = ?,");
+
+            PreparedStatement ps = connection.prepareStatement("UPDATE public." +
+                    tableName + " SET " + tableNames + " WHERE id = ?");
+            int index = 1;
+            for (Object value: newValue.getValues()) {
+                ps.setObject(index, value);
+                index++;
+            }
+            ps.setInt(index, id);
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String getNamesFormatted(DataSet newValue, String format) {
+        String string = "";
+        for (String name : newValue.getNames()) {
+            string += String.format(format, name);
+        }
+        string = string.substring(0, string.length() - 1);
+        return string;
     }
 }
