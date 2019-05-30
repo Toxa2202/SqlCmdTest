@@ -9,15 +9,15 @@ import static junit.framework.TestCase.assertEquals;
  * Created by anton.sviatov on 23.05.2019.
  */
 
-public class DatabaseManagerTest {
-        // Don't need to import DatabaseManager class, coz we call him in test variable
+public class JDBCDatabaseManagerTest {
+        // Don't need to import JDBCDatabaseManager class, coz we call him in test variable
     private DatabaseManager manager;
 
         // Launch once before all tests (make connection)
     @Before
     public void setup() {
-            // create new object of DatabaseManager
-        manager = new DatabaseManager();
+            // create new object of JDBCDatabaseManager
+        manager = new JDBCDatabaseManager();
             // call method 'connect' to launch connection with 'sqlcmd'
         manager.connect("sqlcmd", "postgres", "postgres");
     }
