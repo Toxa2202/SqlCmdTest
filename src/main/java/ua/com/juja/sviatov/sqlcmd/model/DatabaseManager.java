@@ -1,4 +1,4 @@
-package ua.com.juja.sviatov.sqlcmd;
+package ua.com.juja.sviatov.sqlcmd.model;
 
 /**
  * Created by anton.sviatov on 25.05.2019.
@@ -8,11 +8,11 @@ public interface DatabaseManager {
 
     String[] getTableNames();
 
-    void connect(String database, String user, String password);
+    void connect(String database, String userName, String password);
 
     void clear(String tableName);
 
-    void create(DataSet input);
+    void create(String tableName, DataSet input);
 
     void update(String tableName, int id, DataSet newValue);
 }

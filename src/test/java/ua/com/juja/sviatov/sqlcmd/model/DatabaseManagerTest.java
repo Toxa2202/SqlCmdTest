@@ -1,7 +1,8 @@
-package ua.com.juja.sviatov.sqlcmd;
+package ua.com.juja.sviatov.sqlcmd.model;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import java.util.Arrays;
 import static junit.framework.TestCase.assertEquals;
 
@@ -9,20 +10,22 @@ import static junit.framework.TestCase.assertEquals;
  * Created by anton.sviatov on 23.05.2019.
  */
 
-public class JDBCDatabaseManagerTest {
+public abstract class DatabaseManagerTest {
         // Don't need to import JDBCDatabaseManager class, coz we call him in test variable
     private DatabaseManager manager;
 
-        // Launch once before all tests (make connection)
+    public abstract DatabaseManager getDatabaseManager();
+
+    // Launch once before all tests (make connection)
     @Before
     public void setup() {
             // create new object of JDBCDatabaseManager
-        manager = new JDBCDatabaseManager();
+        manager = getDatabaseManager();
             // call method 'connect' to launch connection with 'sqlcmd'
         manager.connect("sqlcmd", "postgres", "postgres");
     }
 
-        // First test
+    // First test
     @Test
     public void testGetAllTableNames() {
             // Put in array list of databases
@@ -38,10 +41,10 @@ public class JDBCDatabaseManagerTest {
 
             // when
         DataSet input = new DataSet();
-        input.put("id", 13);
         input.put("name", "Stiven");
         input.put("password", "pass");
-        manager.create(input);
+        input.put("id", 13);
+        manager.create("user", input);
 
             //then
         DataSet[] users = manager.getTableData("user");
@@ -58,10 +61,10 @@ public class JDBCDatabaseManagerTest {
         manager.clear("user");
 
         DataSet input = new DataSet();
-        input.put("id", 13);
         input.put("name", "Stiven");
         input.put("password", "pass");
-        manager.create(input);
+        input.put("id", 13);
+        manager.create("user", input);
 
         // when
         DataSet newValue = new DataSet();

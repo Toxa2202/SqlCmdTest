@@ -1,8 +1,7 @@
-package ua.com.juja.sviatov.sqlcmd;
+package ua.com.juja.sviatov.sqlcmd.model;
 
 import java.sql.*;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * Created by anton.sviatov on 23.05.2019.
@@ -24,7 +23,7 @@ public class JDBCDatabaseManager implements DatabaseManager {
             int index = 0;
 
             while (rs.next()) {
-                // Save every line in array with index iteration
+                // Save every line in array with freeIndex iteration
                 DataSet dataSet = new DataSet();
                 result[index++] = dataSet;
                 // Save info from all not-empty tables with PUT method
@@ -84,29 +83,28 @@ public class JDBCDatabaseManager implements DatabaseManager {
 
         // Connection to Database
     @Override
-    public void connect(String database, String user, String password) {
+    public void connect(String database, String userName, String password) {
             // Try to catch ClassNotFoundException errors
         try {
                 // Connect to jdbc driver
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
                 // If Error - get message
-            System.out.println("Please add jdbc jar to project");
-            e.printStackTrace();
+            throw new RuntimeException("Please add jdbc jar to project", e);
         }
-
             // Try to catch SQLException errors
         try {
                 // Make connection to current DB with login / password
             connection = DriverManager.getConnection(
-                        "jdbc:postgresql://localhost:5434/"
-                                + database, user, password);
+                        "jdbc:postgresql://localhost:5434/" + database,
+                        userName, password);
         } catch (SQLException e) {
-                // If errors - get message
-            System.out.println(String.format("Can't get connection for database:%s user:%s", database, user));
-            e.printStackTrace();
-                // close connection
+            // close connection
             connection = null;
+            // If errors - get message
+            throw new RuntimeException(
+                    String.format("Can't get connection for model:%s user:%s",
+                            database, userName), e);
         }
     }
 
@@ -122,14 +120,14 @@ public class JDBCDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public void create(DataSet input) {
+    public void create(String tableName, DataSet input) {
         try {
             Statement stmt = connection.createStatement();
 
             String tableNames = getNamesFormatted(input, "%s,");
             String values = getValuesFormatted(input, "'%s',");
 
-            stmt.executeUpdate("INSERT INTO public.user (" + tableNames + ")" +
+            stmt.executeUpdate("INSERT INTO public." + tableName + " (" + tableNames + ")" +
                     "VALUES (" + values + ")");
             stmt.close();
         } catch (SQLException e) {
