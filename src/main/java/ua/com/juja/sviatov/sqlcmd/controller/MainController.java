@@ -25,25 +25,32 @@ public class MainController {
                 "database|userName|password:");
 
         while (true) {
-            String str = view.read();
-            String[] data = str.split("\\|");
-            String databaseName = data[0];
-            String userName = data[1];
-            String password = data[2];
-
             try {
+                String str = view.read();
+                String[] data = str.split("\\|");
+                if (data.length != 3) {
+                    throw new IllegalArgumentException("You must enter 3 parameters, like: db|user|password");
+                }
+                String databaseName = data[0];
+                String userName = data[1];
+                String password = data[2];
+
                 manager.connect(databaseName, userName, password);
                 break;
             } catch (Exception e) {
-                String message = e.getMessage();
-                if (e.getCause() != null) {
-                    message += " " + e.getCause().getMessage();
-                }
-                view.write("Error, because of " + message);
-                view.write("Try again!");
+                printError(e);
             }
         }
 
         view.write("Success!");
+    }
+
+    private void printError(Exception e) {
+        String message = e.getMessage();
+        if (e.getCause() != null) {
+            message += " " + e.getCause().getMessage();
+        }
+        view.write("Error, because of: " + message);
+        view.write("Try again!");
     }
 }
