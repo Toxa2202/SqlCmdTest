@@ -3,6 +3,8 @@ package ua.com.juja.sviatov.sqlcmd.controller;
 import ua.com.juja.sviatov.sqlcmd.model.DatabaseManager;
 import ua.com.juja.sviatov.sqlcmd.view.View;
 
+import java.util.Arrays;
+
 /**
  * Created by anton.sviatov on 26.09.2019.
  */
@@ -17,6 +19,34 @@ public class MainController {
 
     public void run() {
         connectToDB();
+
+        while (true) {
+            view.write("Enter Command (or Help for help):");
+            String command = view.read();
+
+            if (command.equals("list")) {
+                doList();
+            } else if (command.equals("help")){
+                doHelp();
+            } else {
+                view.write("Command does not exist: " + command);
+            }
+        }
+    }
+
+    private void doHelp() {
+        view.write("Existing commands:");
+        view.write("\tlist");
+        view.write("\t\tfor all databases list");
+        view.write("\thelp");
+        view.write("\t\tfor view this list on the screen");
+
+    }
+
+    private void doList() {
+        String[] tableNames = manager.getTableNames();
+        String message = Arrays.toString(tableNames);
+        view.write(message);
     }
 
     private void connectToDB() {
