@@ -165,6 +165,35 @@ public class JDBCDatabaseManager implements DatabaseManager {
         }
     }
 
+    @Override
+    public String[] getTableColumns(String tableName) {
+        // try to catch SQL errors
+        try {
+            Statement stmt = connection.createStatement();
+            // Select all tables
+            ResultSet rs = stmt.executeQuery("SELECT * FROM " +
+                    "information_schema.columns WHERE table_schema = 'public' AND " +
+                    "table_name = '" + tableName + "'");
+            // Create empty 100  String array
+            String[] tables = new String[100];
+            int index = 0;
+            // Put info inside the array, call every time ResultSet
+            while (rs.next()) {
+                tables[index++] = rs.getString("column_name");
+            }
+            // Save only not empty fields in the array
+            tables = Arrays.copyOf(tables, index, String[].class);
+            stmt.close();
+            rs.close();
+            // Return list of tables upstairs
+            return tables;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // If Error, return empty array
+            return new String[0];
+        }
+    }
+
     private String getNamesFormatted(DataSet newValue, String format) {
         String string = "";
         for (String name : newValue.getNames()) {
