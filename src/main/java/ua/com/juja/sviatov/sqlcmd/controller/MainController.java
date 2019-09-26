@@ -1,18 +1,25 @@
 package ua.com.juja.sviatov.sqlcmd.controller;
 
 import ua.com.juja.sviatov.sqlcmd.model.DatabaseManager;
-import ua.com.juja.sviatov.sqlcmd.model.JDBCDatabaseManager;
-import ua.com.juja.sviatov.sqlcmd.view.Console;
 import ua.com.juja.sviatov.sqlcmd.view.View;
 
 /**
  * Created by anton.sviatov on 26.09.2019.
  */
 public class MainController {
-    public static void main(String[] args) {
-        View view = new Console();
-        DatabaseManager manager = new JDBCDatabaseManager();
+    private View view;
+    private DatabaseManager manager;
 
+    public MainController(View view, DatabaseManager manager) {
+        this.view = view;
+        this.manager = manager;
+    }
+
+    public void run() {
+        connectToDB();
+    }
+
+    private void connectToDB() {
         view.write("Hello, user!");
         view.write("Enter database name, user name and password in format:" +
                 "database|userName|password:");
